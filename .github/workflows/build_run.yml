@@ -42,8 +42,8 @@ jobs:
        cp -R dist/* checkout
        ls -Ra checkout
     - run: | 
-       git config user.name "megroponte"
-       git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+       git config user.name ${{ secrets.PUSH_USER_NAME }}
+       git config user.email ${{ secrets.PUSH_EMAIL }}
        cd checkout
        git add .
        git commit -m "generated"
