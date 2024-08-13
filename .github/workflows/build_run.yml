@@ -39,8 +39,6 @@ jobs:
           path:  checkout
     - run: |
        pwd
-       ls -a
-       ls -a checkout
        cp -R dist/* checkout
        ls -R checkout
     # - run: | 
