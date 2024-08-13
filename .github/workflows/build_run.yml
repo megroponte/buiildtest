@@ -33,9 +33,7 @@ jobs:
     - run: |
        npm ci
        npx nuxi generate
-       mkdir build_nuxt
        mkdir checkout
-       mv dist build_nuxt
     - uses: actions/checkout@v4
       with:
           path:  checkout
@@ -43,7 +41,8 @@ jobs:
        pwd
        ls -a
        ls -a checkout
-       ls -a build_nuxt
+       cp -R dist/* checkout
+       ls -R checkout
     # - run: | 
     #    git config user.name "github-actions[bot]"
     #    git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
