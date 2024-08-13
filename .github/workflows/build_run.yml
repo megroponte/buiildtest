@@ -24,17 +24,19 @@ jobs:
     # if: github.event.inputs.mode == 'ビルド' 
     runs-on: ubuntu-latest
     steps:
+    - run: |
+       mkdir build_nuxt
+       cd build_nuxt
     - uses: actions/checkout@v4
       with:
         repository: megroponte/microcms-blog
-
     - uses: actions/setup-node@v4
       with:
         node-version: 20
     - run: |
-        npm ci
-        npx nuxi generate
+       npm ci
+       npx nuxi generate
     - run: |
-        cd dist
-        ls -R 
+       cd dist
+       ls -R 
       
