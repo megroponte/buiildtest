@@ -37,10 +37,10 @@ jobs:
        mv dist build_nuxt
        cd build_nuxt/dist
        cd ..
-    - uses: actions/checkout@v4
+    # - uses: actions/checkout@v4
     - run: |
        pwd
-       ls -a
+       ls -aR
     # - run: | 
     #    git config user.name "github-actions[bot]"
     #    git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
