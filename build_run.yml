@@ -1,0 +1,104 @@
+name: microcms-build
+on: 
+  # push:
+  #   branches: [main]
+  repository_dispatch:
+    types: [blog-update]
+  # schedule:
+  #   - cron: '0,15,30,45 * * * *'
+  workflow_dispatch:
+    inputs:
+      mode:
+        type: choice
+        options:
+          - テスト
+          - 本番用ファイルをビルド
+          - 本番サーバにビルドしたファイルをアップロード
+        default: 'テスト'
+        required: true
+        description: '処理項目'
+      cache-date:
+        type: string
+        required: false
+        description: 'キャッシュを作成した日時分'
+env:
+  MICROCMS_SERVICE_DOMAIN: ${{ secrets.MICROCMS_SERVICE_DOMAIN }}
+  MICROCMS_API_KEY: ${{ secrets.MICROCMS_API_KEY }}
+
+jobs:
+  test:
+    if: github.event.inputs.mode != '本番用ファイルをビルド' && github.event.inputs.mode != '本番サーバにビルドしたファイルをアップロード' && github.event_name != 'schedule'
+    runs-on: ubuntu-latest
+    steps:
+    - run: echo 'test'
+    - uses: actions/checkout@v4
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 20
+    - run: |
+        npm ci
+        npx nuxi generate
+    # - run: |
+    #     zip -r dist.zip dist
+    # - uses: actions/upload-artifact@v4
+    #   with:
+    #     name: ${{ github.sha }}-${{ github.run_id }}
+    #     path: dist.zip
+    #     retention-days: 1
+
+    # - uses: actions/download-artifact@v4
+    # - run: |
+    #     ls -la
+  
+  production_build:
+    if: github.event.inputs.mode == '本番用ファイルをビルド' || github.event_name == 'schedule'
+    runs-on: ubuntu-latest
+    steps:
+    - run: |
+       echo "production_build"
+    - uses: actions/checkout@v4
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 20
+    - run: |
+        npm ci
+        npx nuxi generate
+    - run: |
+        zip -r dist.zip dist
+        ls -l dist.zip
+    - name: Get Date
+      id: get-date
+      run: |
+        echo "date=$(/bin/date -u "+%Y%m%d%H%M")" >> $GITHUB_OUTPUT
+    - uses: actions/cache/save@v4
+      with:
+        path: "dist.zip"
+        key: prod_main-${{ steps.get-date.outputs.date }}
+    - uses: actions/upload-artifact@v4
+      with:
+        name: prod_main-${{ steps.get-date.outputs.date }}
+        path: dist.zip
+        retention-days: 1
+
+  production_deploy:
+    if: github.event.inputs.mode == '本番サーバにビルドしたファイルをアップロード'  &&  github.event_name != 'schedule'
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          echo "production_deploy"
+      - uses: actions/cache/restore@v4
+        id: cache-restore-prod
+        with:
+            path: "dist.zip"
+            key: prod_main-${{ github.event.inputs.cache-date }}
+      - name: キャッシュのリストア
+        if: steps.cache-restore-prod.outputs.cache-hit == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: prod_main-${{ github.event.inputs.cache-date }}
+          path: dist.zip
+          retention-days: 1
+      - run: |
+         ls -l
+
+      
