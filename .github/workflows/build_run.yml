@@ -35,5 +35,5 @@ jobs:
         npm ci
         npx nuxi generate
     - run: |
-        ls -la
+        ls -la dist
       
