@@ -1,0 +1,39 @@
+name: microcms-build
+on: 
+  # push:
+  #   branches: [main]
+  repository_dispatch:
+    types: [blog-update]
+  # schedule:
+  #   - cron: '0,15,30,45 * * * *'
+  workflow_dispatch:
+    inputs:
+      mode:
+        type: choice
+        options:
+          - ビルド
+        default: 'ビルド'
+        required: true
+        description: '処理項目'
+env:
+  MICROCMS_SERVICE_DOMAIN: ${{ secrets.MICROCMS_SERVICE_DOMAIN }}
+  MICROCMS_API_KEY: ${{ secrets.MICROCMS_API_KEY }}
+
+jobs:
+  build:
+    if: github.event.inputs.mode == 'ビルド' 
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        repository: megroponte/microcms-blog
+
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 20
+    - run: |
+        npm ci
+        npx nuxi generate
+    - run: |
+        ls -la
+      
