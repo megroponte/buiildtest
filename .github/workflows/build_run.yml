@@ -37,6 +37,6 @@ jobs:
        npm ci
        npx nuxi generate
     - run: |
-       cd dist
+       cd build_nuxt/dist
        ls -R 
       
