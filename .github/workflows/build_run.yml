@@ -39,10 +39,9 @@ jobs:
           path:  checkout
     - run: |
        cp -R dist/* checkout
-    - run: | 
+       cd checkout
        git config --local user.email ${{ secrets.PUSH_EMAIL }}
        git config --local user.name ${{ secrets.PUSH_USER_NAME }}
-       cd checkout
        git add .
        git commit -m "generated"
        git push
