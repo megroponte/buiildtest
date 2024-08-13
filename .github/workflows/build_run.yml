@@ -1,7 +1,7 @@
 name: microcms-build
 on: 
-  # push:
-  #   branches: [main]
+  push:
+    branches: [main]
   repository_dispatch:
     types: [blog-update]
   # schedule:
@@ -21,7 +21,7 @@ env:
 
 jobs:
   build:
-    if: github.event.inputs.mode == 'ビルド' 
+    # if: github.event.inputs.mode == 'ビルド' 
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
@@ -35,5 +35,6 @@ jobs:
         npm ci
         npx nuxi generate
     - run: |
-        ls dist
+        cd dist
+        ls -R 
       
